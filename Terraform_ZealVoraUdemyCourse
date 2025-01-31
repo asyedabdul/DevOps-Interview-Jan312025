@@ -1,0 +1,245 @@
+Terraform is used as IaC infrastrucreas code also will be used as configuration tool to change and install certain configurations on resources created
+Terraform supports hundreds of providers like Azure, AWS, GCP, Kubernetes, Alibaba cloud, Oracle cloud infrastrucre. 
+This Course Aligned with Hashicorp certified: Terraform Associate (003) certification.
+GitHub repository for this course -   https://github.com/zealvora/terraform-beginner-to-advanced-resource
+All PPT course resources are available to download in pdf format.
+he has discord server community for terraform if you wish can join at https://kplabs.in/chat (https://discord.com/invite/CbZtnCdm57) and kplabs.in/linkedin
+Particularly automation in Infranstructure point of view can be done with Terraform which is platform independent and can be used as IaC. 
+- BENIFITS OF IaC:
+speed of infrastructure management
+Low risk of human errors
+version control
+easy collaboration between teams.
+
+- You have to choose the right tool amongst Other automation tools to do repeatable tasks
+ Those tools are Ansible, AWS Cloud Formation, Terraform, Heat, SaltStack, Chef, Puppet, Python etc
+1) Infranstructure orchestation : example Terraform, Cloud formation
+2) Configuration Management tools : Ansible, Chef, Puppet etc
+how to choose IaC software in a company depends upon their requirements like multicloud, hybrid cloud, product support needs etc. 
+
+- Installation of Terraform: Very simple installation, Download single binary file to your local from Hashicorp. 
+terraform.io/downloads
+
+-- for windows setup environment variable to binary location then it will work from any cmd location
+for Linux following commands
+
+-- For UBUNTU:
+$ wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+$ sudo apt update && sudo apt install terraform
+
+-- For Amazon Linux: if you download binary arm right copy the path and do wget <path>. unzip the file and sudo mv file to /usr/bin for environment variable to work in linux
+
+sudo yum install -y yum-utils shadow-utils
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+sudo yum -y install terraform
+
+-- Download .msi file from following location and install with defaults then to work from any location in command prompt you have
+create global variable for this you do right click on mycomputer>properties>Adv. System Settings>Environment Variables>select Path
+and browse to location where terraform.exe is there and click OK. 
+
+-- to REMOVE Terraform:
+sudo yum -y remove terraform
+
+-- Choosing the right code editor for Terraform code is imporant for more features and fast development of code. They called Source Code
+editor: Sublime Text, Visual Studio Code, Atom etc
+
+##########################################################################################
+SECTION-2
+-- CONNECTIVITY FROM LOCAL TERRAFORM CONSOLE TO PROVIDER FOR EXAMPLE AWS AND GitHub
+
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "github" {
+  token = "your-token-here"  -- (this token you get it from github.com>profile settings>Developer settings>personal access tokens>token(Classic))
+}
+
+resource "github_repository" "example" {
+  name        = "example"
+  description = "My awesome codebase"
+
+  visibility = "public"
+
+}
+-- FOR AWS: needs access key and secret key you get these when you create new user in AWS console
+FOR GITHUB: needs token on github to be created for Terraform local to authenticate to github.
+
+provider "aws" {
+  region     = "us-east-1"
+  access_key = "PUT-YOUR-ACCESS-KEY-HERE"   
+  secret_key = "PUT-YOUR-SECRET-KEY-HERE"
+}
+
+
+------ NOTE: (These access and secret keys you get when you create terraform user on provider. It is ------
+        NOT recommended to have these access/secret keys in the code as security violation 
+		Hence following is procedure you should follow as standard practice)
+for Linux and MacOS save these files in following locations and Terraform will locate these files. you will get these location save
+when you 
+
+--- Install AWS CLI on local machine on Linux will following commands. 
+
+   15  sudo apt update && sudo apt upgrade -y
+   16  sudo apt install curl unzip -y
+   17  unzip awscliv2.zip
+   18  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+   19  unzip awscliv2.zip
+   20  sudo ./aws/install
+   21  aws configure
+-- When you configure the AWS CLI on an Ubuntu VM (or any system) using aws configure, the Access Key ID and Secret Access Key are stored
+ in the AWS CLI's configuration files located in the user's home directory:
+ 
+~/.aws/credentials: This file stores your Access Key ID and Secret Access Key.
+~/.aws/config: This file stores additional configuration information, such as the default region and output format.
+
+
+for Windows : "%USERPROFILE%\.aws\config"   &  "%USERPROFILE%\.aws\credentials"
+follow the process below:
+
+1) install AWS Cli from location 	https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+2) open cmd > aws to check aws installed properly.
+3) > aws configure
+AWS Access Key ID [****************44A7]: xxxxxxxxxxxxxxxxxxxxxxxxx
+AWS Secret Access Key [****************CbU2]: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Default region name [us-east-1]: us-east-1
+Default output format [None]:
+
+
+
+###############################################################################################################
+SECTION-3
+Terraform Code - First EC2 Instance
+https://github.com/zealvora/terraform-beginner-to-advanced-resource/blob/master/Section%201%20-%20Deploying%20Infrastructure%20with%20Terraform/first-ec2.md
+provider "aws" {
+  region     = "us-east-1"
+  access_key = "PUT-YOUR-ACCESS-KEY-HERE"
+  secret_key = "PUT-YOUR-SECRET-KEY-HERE"
+}
+
+resource "aws_instance" "myec2" {
+    ami = "ami-00c39f71452c08778"
+    instance_type = "t2.micro"
+}
+
+Commands:
+terraform init
+terraform plan
+terraform apply
+
+
+-- CREAT GIT repo "example" with below code
+
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
+  }
+}
+
+# Configure the GitHub Provider
+provider "github" {
+
+    token = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+}
+resource "github_repository" "example" {
+  name        = "example"
+  description = "My awesome codebase"
+
+  visibility = "public"
+}
+
+-- DESTROY THE INSTANCE CREATED IN AWS WITH FOLLOWING
+
+terraform destroy (this will destroy both instance and git repo)
+
+if you want to just delete insrance  you should see TARGET option as below
+terraform destroy - target aws_instance.myec2
+
+-- if you comment out like below terraform plan command assumes that resource is not present hence it will destroy the resource which was 
+comment out.
+
+terraform {
+  required_providers {
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.0"
+    }
+  }
+}
+
+# Configure the GitHub Provider
+provider "github" {
+
+    token = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+}
+/*
+resource "github_repository" "example" {
+  name        = "example"
+  description = "My awesome codebase"
+
+  visibility = "public"
+}
+*/
+
+########################################################################################
+SECTION-3
+TERRAFORM STATE FILE: Terraform stores the state of the infrastructure that is being created with the TF files. 
+                      This state allows terraform to map real world resource to your existing configuration. this file name where
+					  Terraform stores state of infrastructure called Terraform state file. that is with extention .tfstate
+					  
+DESIRED AND CURRENT STATE: Code written to implement for example creating EC2 instance is called Desired state means what we need it to be
+                           current state is as is infrastructure state before DESIRED STATE. These two states may not match all the time.
+IMPORTANT NOTE: if some one go modify EC2 initially created by Terraform as t2.micro to t2.medium, if you run terraform plan again it 
+                 look for the current state as t2.medium and try to match it to Desired state of Terraform which is t2.micro. Moral of story is 
+				Terraform always changethe CURRENT STATE of infrastructure with DESIRED STATE.
+Dependency Lock File: Terraform dependency lock file allows us to lock to a specific version of the provider. If a particular provider
+                       already has a selection recorded in the local file, TF will always re-select that version for installation, 
+					   even if newer version has become available this is particularly imporant in production environment not to have newer version
+					   installed by accident hence break the things.
+					   You can always override this by adding terraform init -upgrade to upgrade the version of provider. 
+					   example: >=1.0, <=1.0, ~>2.0, >=2.10, <=2.30. Best practice to specify exact version with = symbol in the code and have
+					   restrictions specifiy in lock file which version to use not to use. 
+Terraform refresh: Terraform refresh command will check the latest state of yoru infrstructure and update the state file accordingly.
+                   you NO need to do refresh explicitly as terraform plan command do the refresh. 
+                   				   
+################################################################################################
+SECTION-4:  READ , GENERATE, MODIFY CONFIGURATIONS.
+
+-- Creating firewall rules in AWS which is nothing but security groups and its rules, inbound (ingress) outbout (egress) rules using
+   Terraform.
+   
+
+provider "aws" {
+  region     = "us-east-1"
+}
+
+resource "aws_security_group" "allow_tls" {
+  name        = "terraform-firewall"
+  description = "Managed from Terraform"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_tls_ipv6" {
+  security_group_id = aws_security_group.allow_tls.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
+  security_group_id = aws_security_group.allow_tls.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+}
